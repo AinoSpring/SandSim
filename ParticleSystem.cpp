@@ -23,6 +23,25 @@ ParticleSystem::ParticleSystem(unsigned int Width, unsigned int Height, Behaviou
 void ParticleSystem::SetCell(unsigned int X, unsigned int Y, unsigned int Value) {
 
     Particles[X][Y] = Value;
+    RegisterCell(X, Y, Value);
+
+}
+
+void ParticleSystem::RegisterCell(unsigned int X, unsigned int Y, unsigned int Value) {
+
+    if (Value != 0) {
+
+        if (std::find(SetCells.begin(), SetCells.end(), std::vector<unsigned int>({X, Y})) == SetCells.end()) {
+
+            SetCells.push_back({X, Y});
+
+        }
+
+        return;
+
+    }
+
+    SetCells.erase(std::remove(SetCells.begin(), SetCells.end(), std::vector<unsigned int>({X, Y})), SetCells.end());
 
 }
 
@@ -57,58 +76,87 @@ void ParticleSystem::UpdateParticles() {
 
     std::vector<std::vector<unsigned int>> NewParticles = CopyParticles();
 
-    for (int X = 0; X < Width; X++) {
+    for (unsigned int I = 0; I < SetCells.size(); I++) {
 
-        for (int Y = 0; Y < Height; Y++) {
+        int X = SetCells[I][0];
+        int Y = SetCells[I][1];
 
-            unsigned int BehaviourID = Particles[X][Y];
+        unsigned int BehaviourID = GetCell(X, Y);
 
-            if (BehaviourID == 0) {
+        if (BehaviourID == 0) {
+
+            continue;
+
+        }
+
+        BehaviourType CurrentBehaviourType = Behaviour.GetBehaviour(BehaviourID);
+
+        if (CurrentBehaviourType.ShuffleDirections) {
+
+            std::shuffle(std::begin(CurrentBehaviourType.MoveSquares), std::end(CurrentBehaviourType.MoveSquares), RandomEngine);
+
+        }
+
+        for (unsigned int J = 0; J < CurrentBehaviourType.MoveSquares.size(); J++) {
+
+            BehaviourMoveSquare MoveSquare = CurrentBehaviourType.MoveSquares[J];
+
+            int MoveX = X + MoveSquare.DX;
+            int MoveY = Y + MoveSquare.DY;
+
+            if (MoveX < 0 || MoveY < 0 || MoveX >= Width || MoveY >= Height) {
 
                 continue;
 
             }
 
-            BehaviourType CurrentBehaviourType = Behaviour.GetBehaviour(BehaviourID);
+            unsigned int NewMoveSquareBehaviourID = NewParticles[MoveX][MoveY];
 
-            if (CurrentBehaviourType.ShuffleDirections) {
+            BehaviourType NewMoveSquareBehaviourType = Behaviour.GetBehaviour(NewMoveSquareBehaviourID);
 
-                std::shuffle(std::begin(CurrentBehaviourType.FallingSquares), std::end(CurrentBehaviourType.FallingSquares), RandomEngine);
+            bool Move = false;
 
-            }
+            switch (MoveSquare.CheckType) {
 
-            for (unsigned int I = 0; I < CurrentBehaviourType.FallingSquares.size(); I ++) {
+                case BehaviourMoveCheckType::Density:
+                    Move = NewMoveSquareBehaviourType.Density < CurrentBehaviourType.Density;
+                    break;
+                case BehaviourMoveCheckType::Group:
+                    for (unsigned int K = 0; K < MoveSquare.MoveGroups.size(); K++) {
 
-                int DX = CurrentBehaviourType.FallingSquares[I][0];
-                int DY = CurrentBehaviourType.FallingSquares[I][1];
+                        if (std::find(NewMoveSquareBehaviourType.Groups.begin(), NewMoveSquareBehaviourType.Groups.end(), MoveSquare.MoveGroups[K]) != NewMoveSquareBehaviourType.Groups.end()) {
 
-                int FallingX = X + DX;
-                int FallingY = Y + DY;
+                            Move = true;
+                            break;
 
-                if (FallingX < 0 || FallingY < 0 || FallingX >= Width || FallingY >= Height) {
+                        }
 
-                    continue;
-
-                }
-
-                unsigned int FallingSquareBehaviourID = Particles[FallingX][FallingY];
-
-                if (FallingSquareBehaviourID != NewParticles[FallingX][FallingY]) {
-
-                    continue;
-
-                }
-
-                BehaviourType FallingSquareBehaviourType = Behaviour.GetBehaviour(FallingSquareBehaviourID);
-
-                if (FallingSquareBehaviourType.Density < CurrentBehaviourType.Density) {
-
-                    NewParticles[X][Y] = FallingSquareBehaviourID;
-                    NewParticles[FallingX][FallingY] = BehaviourID;
+                    }
 
                     break;
 
+            }
+
+            if (Move) {
+
+                switch (MoveSquare.MoveType) {
+
+                    case BehaviourMoveType::Swap:
+                        NewParticles[X][Y] = NewMoveSquareBehaviourID;
+                        RegisterCell(X, Y, NewMoveSquareBehaviourID);
+                        NewParticles[MoveX][MoveY] = BehaviourID;
+                        RegisterCell(MoveX, MoveY, BehaviourID);
+                        break;
+                    case BehaviourMoveType::Replace:
+                        NewParticles[X][Y] = 0;
+                        RegisterCell(X, Y, 0);
+                        NewParticles[MoveX][MoveY] = BehaviourID;
+                        RegisterCell(X, Y, BehaviourID);
+                        break;
+
                 }
+
+                break;
 
             }
 

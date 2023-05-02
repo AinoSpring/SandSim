@@ -5,8 +5,12 @@ int main() {
 
     BehaviourGroup Behaviour;
 
+    Behaviour.AddGroup("Fluid");
+    Behaviour.AddGroup("Solid");
+
     Behaviour.AddBehaviour({
                                    {},
+                                   {0},
                                    0,
                                    0,
                                    0,
@@ -17,10 +21,11 @@ int main() {
     Behaviour.AddBehaviour({
 
                                    {
-                                           {0, 1},
-                                           {1, 1},
-                                           {-1, 1}
+                                           {0, 1, Density, Swap},
+                                           {1, 1, Density, Swap},
+                                           {-1, 1, Density, Swap}
                                    },
+                                   {1},
                                    1.52,
                                    198,
                                    166,
@@ -33,18 +38,19 @@ int main() {
     Behaviour.AddBehaviour({
 
                                    {
-                                               {0, 1},
-                                               {1, 1},
-                                               {-1, 1},
-                                               {0, 1},
-                                               {1, 1},
-                                               {-1, 1},
-                                               {0, 1},
-                                               {1, 1},
-                                               {-1, 1},
-                                               {1, 0},
-                                               {-1, 0}
+                                               {0, 1, Density, Swap},
+                                               {1, 1, Density, Swap},
+                                               {-1, 1, Density, Swap},
+                                               {0, 1, Density, Swap},
+                                               {1, 1, Density, Swap},
+                                               {-1, 1, Density, Swap},
+                                               {0, 1, Density, Swap},
+                                               {1, 1, Density, Swap},
+                                               {-1, 1, Density, Swap},
+                                               {1, 0, Density, Swap},
+                                               {-1, 0, Density, Swap}
                                    },
+                                   {0},
                                    1,
                                    9,
                                    195,

@@ -15,11 +15,13 @@ private:
     unsigned int Width;
     unsigned int Height;
     std::vector<std::vector<unsigned int>> Particles;
+    std::vector<std::vector<unsigned int>> SetCells;
     std::linear_congruential_engine<uint_fast32_t, 16807UL, 0UL, 2147483647UL> RandomEngine;
 
 public:
     ParticleSystem(unsigned int Width, unsigned int Height, BehaviourGroup Behaviour);
     void SetCell(unsigned int X, unsigned int Y, unsigned int Value);
+    void RegisterCell(unsigned int X, unsigned int Y, unsigned int Value);
     unsigned int GetCell(unsigned int X, unsigned int Y);
     std::vector<std::vector<unsigned int>> CopyParticles();
     void UpdateParticles();

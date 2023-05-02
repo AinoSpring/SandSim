@@ -73,7 +73,7 @@ void Application::OnEvent(SDL_Event *Event) {
                 StringKey << Key;
                 if (Event->key.keysym.sym == StringKey.str().c_str()[0]) {
 
-                    CurrentType = Key;
+                    CurrentType = Key % ParticleSys.Behaviour.BehaviourCount();
                     break;
 
                 }
