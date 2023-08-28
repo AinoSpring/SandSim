@@ -1,0 +1,3 @@
+/home/aino/Documents/SandSim/build/CMakeFiles/SandSim.dir
+/home/aino/Documents/SandSim/build/CMakeFiles/edit_cache.dir
+/home/aino/Documents/SandSim/build/CMakeFiles/rebuild_cache.dir

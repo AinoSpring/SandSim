@@ -12,7 +12,7 @@
 #include "Behaviour.h"
 
 class Application {
-private:
+  private:
     bool Running;
     std::string Title;
     unsigned int Width;
@@ -21,18 +21,18 @@ private:
     SDL_Renderer *Renderer;
     unsigned int CurrentType = 1;
 
-public:
+  public:
     Application(std::string Title, unsigned int Width, unsigned int Height, BehaviourGroup Behaviour);
     int OnExecute();
 
-public:
+  public:
     bool OnInit();
     void OnEvent(SDL_Event* Event);
     void OnLoop();
     void OnRender();
     void OnCleanup();
 
-public:
+  public:
     ParticleSystem ParticleSys;
 
 };

@@ -1,0 +1,6 @@
+[project]
+name=SandSim
+
+[dev]
+run=mkdir -p build ; cd build ; cmake .. ; make ; ./SandSim
+build=mkdir -p build ; cd build ; cmake .. ; make
